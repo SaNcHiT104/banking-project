@@ -158,11 +158,34 @@ const updateUi = function (acc) {
 
 //setting log in
 
-let currentAccount;
+let currentAccount, timer; //timer global created because when we swotch we need to set off one timer
 //fake log in setup
 // currentAccount = account1;
 // updateUi(currentAccount);
 // containerApp.classList.remove('hidden');
+
+const startLogOutTimer = function () {
+  //set time to 5 minutes
+  let time = 60 * 5;
+  //call the timer every second
+  const tick = function () {
+    //we can see previous timer so to handle this we did this
+    //in each call print the remain ing time to UI
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(time % 60).padStart(2, 0);
+    labelTimer.textContent = `${min}:${sec}`;
+    if (time == 0) {
+      clearInterval(timer);
+      containerApp.classList.add('hidden');
+      labelWelcome.textContent = 'Log in to get started';
+    }
+    time--;
+    //when time =0 top the timer and log out
+  };
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer;
+};
 
 //setting date
 const now = new Date();
@@ -191,6 +214,11 @@ btnLogin.addEventListener('click', function (e) {
     //clearing input fields
     inputLoginUsername.value = inputLoginPin.value = '';
     inputClosePin.blur();
+    if (timer) {
+      clearInterval(timer);
+    }
+
+    timer = startLogOutTimer(); //on account change we will have a timer which will be cleared in above if
     updateUi(currentAccount);
   }
 });
@@ -215,6 +243,10 @@ btnTransfer.addEventListener('click', function (e) {
     currentAccount.movements.push(-amt);
     receiverAct.movements.push(amt);
     updateUi(currentAccount);
+
+    //resetiing timer
+    clearInterval(timer);
+    timer = startLogOutTimer();
   }
 });
 
@@ -241,10 +273,16 @@ btnLoan.addEventListener('click', function (e) {
   const amt = Number(inputLoanAmount.value);
   if (amt > 0 && currentAccount.movements.some(move => move >= amt * 0.1)) {
     //amount added accoriding to flow chart
-    currentAccount.movements.push(amt);
-    updateUi(currentAccount);
+    setTimeout(function () {
+      currentAccount.movements.push(amt);
+      updateUi(currentAccount);
+    }, 2500); //delay of 2.5 sec is added to approve the loan
   }
   inputLoanAmount.value = '';
+
+  //resetting timer
+  clearInterval(timer);
+  timer = startLogOutTimer();
 });
 
 let sorted = false;
@@ -253,4 +291,6 @@ btnSort.addEventListener('click', function (e) {
   displaymovement(currentAccount.movements, !sorted);
   sorted = !sorted;
 });
+//setting up clock for 5 min
+
 /////////////////////////////////////////////////
