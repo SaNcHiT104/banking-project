@@ -5,6 +5,8 @@
 // BANKIST APP
 
 // Data
+
+// ₹
 const account1 = {
   owner: 'Sanchit Jain',
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
@@ -66,11 +68,13 @@ const inputClosePin = document.querySelector('.form__input--pin');
 // LECTURES
 
 const currencies = new Map([
-  ['USD', 'United States dollar'],
+  [('RS', 'Indian currency')],
+  [('USD', 'United States dollar')],
   ['EUR', 'Euro'],
   ['GBP', 'Pound sterling'],
 ]);
-
+//hiding movements
+containerApp.classList.add('hidden');
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 //displaying movement of credit and debited
@@ -84,7 +88,7 @@ const displaymovement = function (movement) {
         <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-        <div class="movements__value">${mov}€</div>
+        <div class="movements__value">${mov}₹</div>
       </div>
     `;
 
@@ -92,9 +96,37 @@ const displaymovement = function (movement) {
   });
 };
 
-displaymovement(account1.movements);
+//displaying total balance
+const calcDisplayBalance = function (movement) {
+  const balance = movement.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${balance} ₹`;
+};
 
-const user = 'Sanchit Jain';
+//calculating in,out and interest
+const calcDisplaySummary = function (acc) {
+  const movements = acc.movements;
+  const income = movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumIn.textContent = `${income}₹`;
+
+  const spend = movements
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc - mov, 0);
+  labelSumOut.textContent = `${spend}₹`;
+
+  const interest = movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * acc.interestRate) / 100)
+    .filter((int, i, arr) => {
+      //for interest > 1
+      return int >= 1;
+    })
+    .reduce((acc, int) => acc + int, 0);
+  labelSumInterest.textContent = `${interest}₹`;
+};
+
+// const user = 'Sanchit Jain';
 //converting Sanchit Jain to sj for all the account objects
 const createUserName = function (accs) {
   accs.forEach(function (acc) {
@@ -109,5 +141,34 @@ const createUserName = function (accs) {
 };
 createUserName(accounts);
 // console.log(accounts);
+
+//setting log in
+
+let currentAccount;
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault(); //page reload happens when form submit button is pressed
+  currentAccount = accounts.find(
+    acc => acc.username === inputLoginUsername.value
+  );
+  console.log(currentAccount);
+
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // added ? because if currentAccount obj exist only we check the password else it will throw error on cosnole
+    //display UI message
+    labelWelcome.textContent = `Welcome Back,${
+      currentAccount.owner.split(' ')[0]
+    } !`;
+    containerApp.classList.remove('hidden');
+    //clearing input fields
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputClosePin.blur();
+    //display movement
+    displaymovement(currentAccount.movements);
+    //display balance
+    calcDisplayBalance(currentAccount.movements);
+    //display summary
+    calcDisplaySummary(currentAccount);
+  }
+});
 
 /////////////////////////////////////////////////

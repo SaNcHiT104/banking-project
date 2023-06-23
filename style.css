@@ -18,7 +18,11 @@ html {
 body {
   font-family: 'Poppins', sans-serif;
   color: #444;
-  background-color: #f3f3f3;
+  background-image: linear-gradient(
+    to right,
+    rgb(10, 110, 189, 0.2),
+    rgb(231, 206, 166)
+  );
   height: 100vh;
   padding: 2rem;
 }
@@ -92,10 +96,11 @@ nav {
   grid-template-columns: 4fr 3fr;
   grid-template-rows: auto repeat(3, 15rem) auto;
   gap: 2rem;
-
   /* NOTE This creates the fade in/out anumation */
-  /* opacity: 0; */
   transition: all 1s;
+}
+.hidden {
+  opacity: 0;
 }
 
 .balance {
