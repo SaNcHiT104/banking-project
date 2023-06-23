@@ -78,9 +78,10 @@ containerApp.classList.add('hidden');
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 //displaying movement of credit and debited
-const displaymovement = function (movement) {
+const displaymovement = function (movement, sort = false) {
   containerMovements.innerHTML = ''; //removing previous
-  movement.forEach(function (mov, i) {
+  const movs = sort ? movement.slice().sort((a, b) => a - b) : movement; //slice first due to copy
+  movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal'; //deciding the type of class
 
     const html = `
@@ -88,7 +89,7 @@ const displaymovement = function (movement) {
         <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-        <div class="movements__value">${mov}₹</div>
+        <div class="movements__value">${mov.toFixed(2)}₹</div>
       </div>
     `;
 
@@ -96,10 +97,11 @@ const displaymovement = function (movement) {
   });
 };
 
+//toFixed()
 //displaying total balance
 const calcDisplayBalance = function (acc) {
   acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${acc.balance} ₹`;
+  labelBalance.textContent = `${acc.balance.toFixed(2)} ₹`;
 };
 
 //calculating in,out and interest
@@ -108,12 +110,12 @@ const calcDisplaySummary = function (acc) {
   const income = movements
     .filter(mov => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumIn.textContent = `${income}₹`;
+  labelSumIn.textContent = `${income.toFixed(2)}₹`;
 
   const spend = movements
     .filter(mov => mov < 0)
     .reduce((acc, mov) => acc - mov, 0);
-  labelSumOut.textContent = `${spend}₹`;
+  labelSumOut.textContent = `${spend.toFixed(2)}₹`;
 
   const interest = movements
     .filter(mov => mov > 0)
@@ -123,7 +125,7 @@ const calcDisplaySummary = function (acc) {
       return int >= 1;
     })
     .reduce((acc, int) => acc + int, 0);
-  labelSumInterest.textContent = `${interest}₹`;
+  labelSumInterest.textContent = `${interest.toFixed(2)}₹`;
 };
 
 // const user = 'Sanchit Jain';
@@ -228,5 +230,12 @@ btnLoan.addEventListener('click', function (e) {
     updateUi(currentAccount);
   }
   inputLoanAmount.value = '';
+});
+
+let sorted = false;
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault();
+  displaymovement(currentAccount.movements, !sorted);
+  sorted = !sorted;
 });
 /////////////////////////////////////////////////
