@@ -211,6 +211,7 @@ btnClose.addEventListener('click', function (e) {
       acc => acc.username === currentAccount.username
     );
     // console.log(index);
+    inputCloseUsername.value = inputClosePin.value = '';
     accounts.splice(index, 1);
     containerApp.classList.add('hidden');
     labelWelcome.textContent = 'Log in to get started';
@@ -226,5 +227,6 @@ btnLoan.addEventListener('click', function (e) {
     currentAccount.movements.push(amt);
     updateUi(currentAccount);
   }
+  inputLoanAmount.value = '';
 });
 /////////////////////////////////////////////////
