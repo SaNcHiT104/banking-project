@@ -217,4 +217,14 @@ btnClose.addEventListener('click', function (e) {
   }
 });
 
+//setting loan button
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+  const amt = Number(inputLoanAmount.value);
+  if (amt > 0 && currentAccount.movements.some(move => move >= amt * 0.1)) {
+    //amount added accoriding to flow chart
+    currentAccount.movements.push(amt);
+    updateUi(currentAccount);
+  }
+});
 /////////////////////////////////////////////////
