@@ -73,4 +73,41 @@ const currencies = new Map([
 
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
+//displaying movement of credit and debited
+const displaymovement = function (movement) {
+  containerMovements.innerHTML = ''; //removing previous
+  movement.forEach(function (mov, i) {
+    const type = mov > 0 ? 'deposit' : 'withdrawal'; //deciding the type of class
+
+    const html = `
+      <div class="movements__row">
+        <div class="movements__type movements__type--${type}">${
+      i + 1
+    } ${type}</div>
+        <div class="movements__value">${mov}€</div>
+      </div>
+    `;
+
+    containerMovements.insertAdjacentHTML('afterbegin', html); //afterbegin, last one will be on top so descending order
+  });
+};
+
+displaymovement(account1.movements);
+
+const user = 'Sanchit Jain';
+//converting Sanchit Jain to sj for all the account objects
+const createUserName = function (accs) {
+  accs.forEach(function (acc) {
+    acc.username = acc.owner //adding username in every object
+      .toLowerCase()
+      .split(' ')
+      .map(function (name) {
+        return name[0];
+      })
+      .join('');
+  });
+};
+createUserName(accounts);
+// console.log(accounts);
+
 /////////////////////////////////////////////////
