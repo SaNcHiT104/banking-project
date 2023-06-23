@@ -97,9 +97,9 @@ const displaymovement = function (movement) {
 };
 
 //displaying total balance
-const calcDisplayBalance = function (movement) {
-  const balance = movement.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${balance} ₹`;
+const calcDisplayBalance = function (acc) {
+  acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${acc.balance} ₹`;
 };
 
 //calculating in,out and interest
@@ -142,6 +142,18 @@ const createUserName = function (accs) {
 createUserName(accounts);
 // console.log(accounts);
 
+//updating the UI
+
+const updateUi = function (acc) {
+  //display movement
+  displaymovement(acc.movements);
+  //display balance
+
+  calcDisplayBalance(acc);
+  //display summary
+  calcDisplaySummary(acc);
+};
+
 //setting log in
 
 let currentAccount;
@@ -162,12 +174,46 @@ btnLogin.addEventListener('click', function (e) {
     //clearing input fields
     inputLoginUsername.value = inputLoginPin.value = '';
     inputClosePin.blur();
-    //display movement
-    displaymovement(currentAccount.movements);
-    //display balance
-    calcDisplayBalance(currentAccount.movements);
-    //display summary
-    calcDisplaySummary(currentAccount);
+    updateUi(currentAccount);
+  }
+});
+
+//setting transfer button
+
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+  const amt = Number(inputTransferAmount.value);
+  const receiverAct = accounts.find(
+    acc => acc.username === inputTransferTo.value
+  );
+  inputTransferAmount.value = inputTransferTo.value = '';
+  inputTransferAmount.blur();
+  if (
+    amt > 0 &&
+    currentAccount.balance >= amt &&
+    receiverAct && //valid reciever or not
+    receiverAct?.username != currentAccount.username //not back in same acount
+  ) {
+    // console.log('Transfer Valid');
+    currentAccount.movements.push(-amt);
+    receiverAct.movements.push(amt);
+    updateUi(currentAccount);
+  }
+});
+
+//setting delete button
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault();
+  const user = inputCloseUsername.value;
+  const pin = Number(inputClosePin.value);
+  if (user == currentAccount.username && pin == currentAccount.pin) {
+    const index = accounts.findIndex(
+      acc => acc.username === currentAccount.username
+    );
+    // console.log(index);
+    accounts.splice(index, 1);
+    containerApp.classList.add('hidden');
+    labelWelcome.textContent = 'Log in to get started';
   }
 });
 
